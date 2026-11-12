@@ -111,3 +111,4 @@ npm run start
 
 ## 📄 License
 This project is created for educational and career discovery demonstration purposes. All institutional trademarks belong to their respective statutory and academic bodies.
+
