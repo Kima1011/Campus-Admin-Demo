@@ -1,0 +1,205 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model College {
+  id                 String           @id @default(cuid())
+  slug               String           @unique
+  name               String
+  shortName          String
+  collegeType        String           // "IIT", "NIT", "IIM", "AIIMS", "Central University", "Private University", "State University", "Deemed University", "Government College", "Private College"
+  ownership          String           // "Public / Government", "Private"
+  established        Int
+  city               String
+  state              String
+  pincode            String?
+  address            String
+  campusSize         String?          // "630 Acres"
+  logoUrl            String?
+  bannerUrl          String?
+  accreditation      String?          // "AICTE, UGC, NBA"
+  naacGrade          String?          // "A++", "A+", "A"
+  nirfRank           Int?
+  nirfCategory       String?          // "Overall", "Engineering", "Management", "Medical", "University"
+  nirfYear           Int?             // 2024
+  overview           String
+  admissionProcess   String
+  eligibilitySummary String
+  highestPackage     Float?           // In LPA
+  averagePackage     Float?           // In LPA
+  medianPackage      Float?           // In LPA
+  placementYear      Int?             // 2024
+  topRecruiters      String           // Comma-separated
+  facilities         String           // Comma-separated list of facilities
+  officialWebsite    String
+  admissionUrl       String?
+  sourceReference    String           // "NIRF 2024 / Official College Annual Report"
+  lastVerified       String           // "2024-10-15"
+  ratingOverall      Float            @default(4.5)
+  reviewCount        Int              @default(0)
+  isFeatured         Boolean          @default(false)
+
+  courses            CourseOffering[]
+  placements         PlacementRecord[]
+  cutoffs            CutoffRecord[]
+  rankings           RankingRecord[]
+  reviews            Review[]
+  faqs               CollegeFaq[]
+  enquiries          Enquiry[]
+
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+}
+
+model CourseOffering {
+  id              String   @id @default(cuid())
+  collegeId       String
+  college         College  @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+  courseName      String   // "B.Tech in Computer Science and Engineering"
+  degreeLevel     String   // "UG", "PG", "Diploma", "Doctorate"
+  stream          String   // "Engineering", "Management", "Medical", "Design", "Law", "Science", "Commerce", "Arts"
+  specialization  String?  // "Artificial Intelligence", "Finance"
+  duration        String   // "4 Years", "2 Years"
+  totalTuitionFee String   // "₹8.5 Lakhs"
+  annualFee       String?  // "₹2.12 Lakhs"
+  seats           Int?     // 120
+  examAccepted    String   // "JEE Advanced", "CAT"
+  eligibility     String   // "10+2 with 75% in PCM"
+
+  createdAt       DateTime @default(now())
+}
+
+model PlacementRecord {
+  id             String   @id @default(cuid())
+  collegeId      String
+  college        College  @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+  year           Int      // 2024
+  highestPackage Float    // In LPA
+  averagePackage Float    // In LPA
+  medianPackage  Float    // In LPA
+  placementRate  String?  // "94%"
+  totalOffers    Int?     // 1420
+  topRecruiters  String   // Comma-separated
+}
+
+model CutoffRecord {
+  id          String   @id @default(cuid())
+  collegeId   String
+  college     College  @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+  courseName  String
+  examName    String   // "JEE Advanced 2024"
+  round       String   // "Round 6"
+  category    String   // "General", "OBC-NCL", "SC", "ST", "EWS"
+  quota       String   // "All India", "Home State"
+  openingRank Int
+  closingRank Int
+}
+
+model RankingRecord {
+  id        String   @id @default(cuid())
+  collegeId String
+  college   College  @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+  agency    String   // "NIRF", "Outlook", "India Today", "QS World", "Times"
+  rank      Int
+  category  String   // "Overall", "Engineering", "Management"
+  year      Int
+}
+
+model Review {
+  id              String   @id @default(cuid())
+  collegeId       String
+  college         College  @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+  authorName      String
+  course          String
+  batchYear       Int
+  ratingOverall   Float
+  ratingFaculty   Float
+  ratingInfra     Float
+  ratingPlacement Float
+  title           String
+  pros            String
+  cons            String
+  verified        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+}
+
+model CollegeFaq {
+  id        String   @id @default(cuid())
+  collegeId String
+  college   College  @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+  question  String
+  answer    String
+}
+
+model Exam {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  name            String   // "JEE Main 2025"
+  shortName       String   // "JEE Main"
+  stream          String   // "Engineering"
+  level           String   // "National", "State"
+  conductingBody  String   // "National Testing Agency (NTA)"
+  frequency       String   // "Twice a year"
+  mode            String   // "Computer Based Test (CBT)"
+  duration        String   // "3 Hours"
+  officialWebsite String
+  overview        String
+  eligibility     String
+  pattern         String
+  syllabus        String
+  applicationDate String   // "Nov 2024 - Dec 2024"
+  examDate        String   // "Jan 22 - Jan 31, 2025"
+  resultDate      String   // "Feb 2025"
+  cutoffDetails   String
+  isPopular       Boolean  @default(true)
+
+  createdAt       DateTime @default(now())
+}
+
+model Article {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  category    String   // "News", "Exam Notification", "Admission Guide", "Study Abroad", "Career"
+  stream      String?  // "Engineering", "Management", "General"
+  author      String
+  publishedAt String
+  readTime    String   // "4 min read"
+  summary     String
+  content     String
+  imageUrl    String?
+  isFeatured  Boolean  @default(false)
+}
+
+model Enquiry {
+  id               String   @id @default(cuid())
+  collegeId        String?
+  college          College? @relation(fields: [collegeId], references: [id])
+  name             String
+  email            String
+  phone            String
+  city             String
+  courseInterested String
+  message          String?
+  status           String   @default("PENDING") // PENDING, CONTACTED, RESOLVED
+  createdAt        DateTime @default(now())
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("STUDENT") // STUDENT, COUNSELOR, ADMIN
+  phone        String?
+  city         String?
+  streamInterest String?
+  savedColleges String  @default("[]") // JSON array of college slugs
+  createdAt    DateTime @default(now())
+}
+
